@@ -1,10 +1,8 @@
 {
-  config.perSystem = _: {
+  config.perSystem = { config, ... }: {
     config.devenv.shells.default = {
-      languages = {
-        lean4.enable = true;
-        nix.enable = true;
-      };
+      inputsFrom = [ config.packages.default ];
+      languages.nix.enable = true;
 
       git-hooks = {
         default_stages = [ "pre-push" ];

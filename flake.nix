@@ -36,6 +36,7 @@
         ./flake/github/issues.nix
         ./flake/github/pull_request_template.nix
         ./flake/github/repository.nix
+        ./flake/packages.nix
       ];
 
       systems = [
@@ -43,6 +44,5 @@
         "aarch64-linux"
         "x86_64-linux"
       ];
-
     };
 }

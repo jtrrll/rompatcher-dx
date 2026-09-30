@@ -1,0 +1,11 @@
+name = "rompatcher-dx"
+version = "0.1.0"
+srcDir = "src"
+defaultTargets = ["RompatcherDx", "rompatcher-dx"]
+
+[[lean_lib]]
+name = "RompatcherDx"
+
+[[lean_exe]]
+name = "rompatcher-dx"
+root = "Main"
