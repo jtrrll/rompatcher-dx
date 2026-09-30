@@ -8,6 +8,10 @@
       url = "github:mightyiam/files/master";
     };
     flake-parts.url = "github:hercules-ci/flake-parts/main";
+    nix-lib = {
+      flake = false;
+      url = "github:jtrrll/nix-lib/main";
+    };
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     terranix.url = "github:terranix/terranix/main";
     treefmt-nix = {
@@ -24,6 +28,7 @@
         (inputs.files + "/flake-module.nix")
         inputs.terranix.flakeModule
         (inputs.treefmt-nix + "/flake-module.nix")
+        ./flake/checks/parity/rompatcher-js.nix
         ./flake/devshell.nix
         ./flake/formatting.nix
         ./flake/documentation/license.nix

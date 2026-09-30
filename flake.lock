@@ -269,6 +269,23 @@
         "type": "github"
       }
     },
+    "nix-lib": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1790734591,
+        "narHash": "sha256-D/QgndcBlZ6C++7G2rFopb5PwJILaiVD/T7asEX0Ci8=",
+        "owner": "jtrrll",
+        "repo": "nix-lib",
+        "rev": "af0e88f17bd384704104a1d78886ec45c854db68",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jtrrll",
+        "ref": "main",
+        "repo": "nix-lib",
+        "type": "github"
+      }
+    },
     "nixd": {
       "inputs": {
         "flake-parts": [
@@ -382,6 +399,7 @@
         "devenv": "devenv",
         "files": "files",
         "flake-parts": "flake-parts_2",
+        "nix-lib": "nix-lib",
         "nixpkgs": "nixpkgs_2",
         "terranix": "terranix",
         "treefmt-nix": "treefmt-nix_2"
