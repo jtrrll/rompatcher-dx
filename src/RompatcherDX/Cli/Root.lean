@@ -1,7 +1,7 @@
-import RompatcherDx.Cli.Apply
-import RompatcherDx.Cli.Create
+import RompatcherDX.Cli.Apply
+import RompatcherDX.Cli.Create
 
-namespace RompatcherDx.Cli.Root
+namespace RompatcherDX.Cli.Root
 
 open _root_.Cli
 
@@ -18,4 +18,4 @@ def cmd : Cmd := `[Cli|
     Create.cmd
 ]
 
-end RompatcherDx.Cli.Root
+end RompatcherDX.Cli.Root

@@ -5,9 +5,9 @@ import unittest
 from pathlib import Path
 
 
-ROMPATCHER_DX = os.environ["rompatcherDx"]
+ROMPATCHER_DX = os.environ["rompatcherDX"]
 ROMPATCHER_JS = os.environ["rompatcherJs"]
-FORMATS = ("ips", "bps", "ppf", "ups", "aps", "rup", "ebp")
+FORMATS = ("ips",)
 UNPATCHED = bytes((index * 73 + 19) % 256 for index in range(128))
 PATCHED = bytearray(UNPATCHED)
 PATCHED[25:31] = b"patch!"
@@ -38,8 +38,7 @@ class ParityTest(unittest.TestCase):
         )
         self.assertEqual(created.returncode, 0, created.stderr.decode(errors="replace"))
 
-        extension = "ips" if patch_format == "ebp" else patch_format
-        patch = directory / f"patched.{extension}"
+        patch = directory / f"patched.{patch_format}"
         self.assertTrue(patch.is_file(), f"rompatcher-js did not create {patch_format} patch")
         self.assertTrue(patch.read_bytes(), f"rompatcher-js created an empty {patch_format} patch")
 

@@ -1,20 +1,20 @@
 import Cli
-import RompatcherDx
-import RompatcherDx.Cli.IO
+import RompatcherDX
+import RompatcherDX.Cli.IO
 
-namespace RompatcherDx.Cli.Create
+namespace RompatcherDX.Cli.Create
 
 open _root_.Cli
 
-private instance : ParseableType RompatcherDx.PatchFormat where
+private instance : ParseableType RompatcherDX.PatchFormats.PatchFormat where
   name := (inferInstance : ParseableType String).name
-  parse? := RompatcherDx.PatchFormat.parse?
+  parse? := RompatcherDX.PatchFormats.PatchFormat.parse?
 
 private def run (parsed : Parsed) : IO UInt32 := do
   let some flag := parsed.flag? "format" | do
     IO.eprintln "rompatcher-dx create: --format is required"
     return 2
-  match flag.as? RompatcherDx.PatchFormat with
+  match flag.as? RompatcherDX.PatchFormats.PatchFormat with
   | none =>
     IO.eprintln "rompatcher-dx create: invalid patch format"
     return 2
@@ -22,7 +22,7 @@ private def run (parsed : Parsed) : IO UInt32 := do
     try
       let unpatched ← IO.FS.readBinFile ⟨(parsed.positionalArg! "unpatched-rom").value⟩
       let patched ← Cli.readInput ((parsed.flag? "patched-rom").map (·.value))
-      match RompatcherDx.create unpatched patched format with
+      match RompatcherDX.create_patch unpatched patched format with
       | Except.error message =>
         IO.eprintln message
         return (1 : UInt32)
@@ -40,10 +40,10 @@ def cmd : Cmd := `[Cli|
   FLAGS:
     "patched-rom" : String; "Read the patched ROM from a file instead of stdin."
     o, output : String; "Write the patch to a file instead of stdout."
-    f, format : RompatcherDx.PatchFormat; "Patch format to create (required)."
+    f, format : RompatcherDX.PatchFormats.PatchFormat; "Patch format to create (required)."
 
   ARGS:
     "unpatched-rom" : String; "File containing the unpatched ROM."
 ]
 
-end RompatcherDx.Cli.Create
+end RompatcherDX.Cli.Create

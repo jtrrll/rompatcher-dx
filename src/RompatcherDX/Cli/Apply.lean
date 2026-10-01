@@ -1,8 +1,8 @@
 import Cli
-import RompatcherDx
-import RompatcherDx.Cli.IO
+import RompatcherDX
+import RompatcherDX.Cli.IO
 
-namespace RompatcherDx.Cli.Apply
+namespace RompatcherDX.Cli.Apply
 
 open _root_.Cli
 
@@ -13,7 +13,7 @@ private def run (parsed : Parsed) : IO UInt32 := do
   try
     let rom ← Cli.readInput ((parsed.flag? "input").map (·.value))
     let patches ← parsed.variableArgs.toList.mapM fun arg => IO.FS.readBinFile ⟨arg.value⟩
-    match RompatcherDx.apply rom patches with
+    match RompatcherDX.apply_patches rom patches with
     | Except.error message =>
       IO.eprintln message
       return (1 : UInt32)
@@ -36,4 +36,4 @@ def cmd : Cmd := `[Cli|
     ...patches : String; "Patch files to apply in order (at least one required)."
 ]
 
-end RompatcherDx.Cli.Apply
+end RompatcherDX.Cli.Apply

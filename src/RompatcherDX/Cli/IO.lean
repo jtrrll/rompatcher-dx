@@ -1,4 +1,4 @@
-namespace RompatcherDx.Cli
+namespace RompatcherDX.Cli
 
 def readInput (path? : Option String) : IO ByteArray :=
   match path? with
@@ -15,4 +15,4 @@ def writeOutput (path? : Option String) (bytes : ByteArray) : IO Unit :=
     stdout.write bytes
     stdout.flush
 
-end RompatcherDx.Cli
+end RompatcherDX.Cli

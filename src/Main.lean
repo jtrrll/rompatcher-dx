@@ -1,4 +1,4 @@
-import RompatcherDx.Cli.Root
+import RompatcherDX.Cli.Root
 
 def main (args : List String) : IO UInt32 :=
-  RompatcherDx.Cli.Root.cmd.validate args
+  RompatcherDX.Cli.Root.cmd.validate args
