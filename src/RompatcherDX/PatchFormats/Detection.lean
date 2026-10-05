@@ -1,10 +1,7 @@
-import RompatcherDX.TypeAliases
-import RompatcherDX.PatchFormats.IPS
-
 /-!
 # Patch-format detection
 
-This module identifies patch formats by their file headers and parses format names.
+This module identifies patch formats by their file extensions and parses format names.
 -/
 
 namespace RompatcherDX.PatchFormats
@@ -20,14 +17,11 @@ def PatchFormat.parse? (name : String) : Option PatchFormat :=
   | "ips" => some PatchFormat.ips
   | _ => none
 
-/-- Associates each known patch header with its format. -/
-private def formatsByHeader : List (ByteArray × PatchFormat) :=
-  [(IPS.header, PatchFormat.ips)]
-
-/-- Identifies the format of a patch by matching the beginning of its bytes to a known header. -/
-def formatFromHeader? (patch : Patch) : Option PatchFormat :=
-  let matchingEntry? :=
-    formatsByHeader.find? (fun (header, _) => patch.extract 0 header.size == header)
-  matchingEntry?.map (fun (_, format) => format)
+/-- Identifies the format of a patch file by its case-insensitive file extension. -/
+def PatchFormat.fromExtension? (path : System.FilePath) : Option PatchFormat :=
+  let lowercaseExtension? := path.extension.map (fun extension => extension.toLower)
+  match lowercaseExtension? with
+  | some "ips" => some PatchFormat.ips
+  | _ => none
 
 end RompatcherDX.PatchFormats

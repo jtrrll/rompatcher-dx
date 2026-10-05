@@ -19,8 +19,12 @@ private def run (parsed : Parsed) : IO UInt32 := do
     return 1
   try
     let rom ← Cli.readInput ((parsed.flag? "input").map (fun inputFlag => inputFlag.value))
-    let patches ← parsed.variableArgs.toList.mapM (fun patchArgument =>
-      IO.FS.readBinFile (System.FilePath.mk patchArgument.value))
+    let patches ← parsed.variableArgs.toList.mapM (fun patchArgument => do
+      let path := System.FilePath.mk patchArgument.value
+      let some format := RompatcherDX.PatchFormats.PatchFormat.fromExtension? path
+        | throw (IO.userError s!"unrecognized patch file extension: {path}")
+      let patch ← IO.FS.readBinFile path
+      return (format, patch))
     match RompatcherDX.apply_patches rom patches with
     | Except.error message =>
       IO.eprintln message
@@ -42,7 +46,7 @@ def cmd : Cmd := `[Cli|
     o, output : String; "Write the patched ROM to a file instead of stdout."
 
   ARGS:
-    ...patches : String; "Patch files to apply in order (at least one required)."
+    ...patches : String; "Patch files to apply in order, in the format given by each file's extension (at least one required)."
 ]
 
 end RompatcherDX.Cli.Apply

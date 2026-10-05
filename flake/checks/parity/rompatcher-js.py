@@ -15,78 +15,75 @@ PATCHED[99] = 0
 PATCHED = bytes(PATCHED)
 
 
-def run_cli(executable, args, directory):
-    return subprocess.run(
-        [executable, *args],
-        cwd=directory,
-        capture_output=True,
-        check=False,
+def run(executable: str, *args: str, cwd: Path) -> None:
+    """Runs a command-line program, failing the test with its error output if it fails."""
+    result = subprocess.run([executable, *args], cwd=cwd, capture_output=True, text=True)
+    if result.returncode != 0:
+        raise AssertionError(
+            f"{Path(executable).name} {' '.join(args)} exited with {result.returncode}:\n"
+            f"{result.stderr}"
+        )
+
+
+def rompatcher_dx_apply(rom: Path, patch: Path) -> bytes:
+    """Applies `patch` to `rom` with rompatcher-dx and returns the patched ROM."""
+    output = rom.with_name(f"{rom.stem} (rompatcher-dx){rom.suffix}")
+    run(ROMPATCHER_DX, "apply", "--input", rom.name, "--output", output.name, patch.name, cwd=rom.parent)
+    return output.read_bytes()
+
+
+def rompatcher_dx_create(unpatched: Path, patched: Path, patch_format: str) -> Path:
+    """Creates a patch from `unpatched` to `patched` with rompatcher-dx and returns its path."""
+    patch = patched.with_name(f"{patched.stem} (rompatcher-dx).{patch_format}")
+    run(
+        ROMPATCHER_DX,
+        "create", unpatched.name,
+        "--patched-rom", patched.name,
+        "--format", patch_format,
+        "--output", patch.name,
+        cwd=unpatched.parent,
     )
+    return patch
+
+
+def rompatcher_js_apply(rom: Path, patch: Path) -> bytes:
+    """Applies `patch` to `rom` with rompatcher-js and returns the patched ROM."""
+    run(ROMPATCHER_JS, "patch", rom.name, patch.name, cwd=rom.parent)
+    return rom.with_name(f"{rom.stem} (patched){rom.suffix}").read_bytes()
+
+
+def rompatcher_js_create(unpatched: Path, patched: Path, patch_format: str) -> Path:
+    """Creates a patch from `unpatched` to `patched` with rompatcher-js and returns its path."""
+    run(ROMPATCHER_JS, "create", unpatched.name, patched.name, "--format", patch_format, cwd=unpatched.parent)
+    return patched.with_suffix(f".{patch_format}")
 
 
 class ParityTest(unittest.TestCase):
-    def reference_files(self, directory, patch_format):
+    def write_roms(self) -> tuple[Path, Path]:
+        """Writes the unpatched and patched ROMs to a new temporary directory."""
+        directory = Path(self.enterContext(tempfile.TemporaryDirectory()))
         unpatched = directory / "unpatched.rom"
         patched = directory / "patched.rom"
         unpatched.write_bytes(UNPATCHED)
         patched.write_bytes(PATCHED)
+        return unpatched, patched
 
-        created = run_cli(
-            ROMPATCHER_JS,
-            ["create", unpatched.name, patched.name, "--format", patch_format],
-            directory,
-        )
-        self.assertEqual(created.returncode, 0, created.stderr.decode(errors="replace"))
-
-        patch = directory / f"patched.{patch_format}"
-        self.assertTrue(patch.is_file(), f"rompatcher-js did not create {patch_format} patch")
-        self.assertTrue(patch.read_bytes(), f"rompatcher-js created an empty {patch_format} patch")
-
-        applied = run_cli(ROMPATCHER_JS, ["patch", unpatched.name, patch.name], directory)
-        self.assertEqual(applied.returncode, 0, applied.stderr.decode(errors="replace"))
-        reference_rom = directory / "unpatched (patched).rom"
-        self.assertTrue(reference_rom.is_file(), f"rompatcher-js did not apply {patch_format} patch")
-        self.assertEqual(reference_rom.read_bytes(), PATCHED)
-        return patch
-
-    def assert_matches(self, result, expected, output_file):
-        self.assertEqual(result.returncode, 0, result.stderr.decode(errors="replace"))
-        self.assertTrue(output_file.is_file(), f"Missing output file: {output_file}")
-        self.assertEqual(output_file.read_bytes(), expected)
-
-    def test_apply_patch(self):
+    def test_apply(self) -> None:
         for patch_format in FORMATS:
             with self.subTest(format=patch_format):
-                with tempfile.TemporaryDirectory() as temporary:
-                    directory = Path(temporary)
-                    patch = self.reference_files(directory, patch_format)
+                unpatched, patched = self.write_roms()
+                patch = rompatcher_js_create(unpatched, patched, patch_format)
+                self.assertEqual(
+                    rompatcher_dx_apply(unpatched, patch), rompatcher_js_apply(unpatched, patch)
+                )
 
-                    output = directory / "actual.rom"
-                    result = run_cli(
-                        ROMPATCHER_DX,
-                        ["apply", "--input", "unpatched.rom", "--output", output.name, patch.name],
-                        directory,
-                    )
-                    self.assert_matches(result, PATCHED, output)
-
-    def test_create(self):
+    def test_create(self) -> None:
         for patch_format in FORMATS:
             with self.subTest(format=patch_format):
-                with tempfile.TemporaryDirectory() as temporary:
-                    directory = Path(temporary)
-                    patch = self.reference_files(directory, patch_format)
-                    expected = patch.read_bytes()
-
-                    output = directory / "actual.patch"
-                    result = run_cli(
-                        ROMPATCHER_DX,
-                        [
-                            "create", "unpatched.rom", "--patched-rom", "patched.rom",
-                            "--format", patch_format, "--output", output.name,
-                        ],
-                        directory,
-                    )
-                    self.assert_matches(result, expected, output)
+                unpatched, patched = self.write_roms()
+                rompatcher_dx_patch = rompatcher_dx_create(unpatched, patched, patch_format)
+                rompatcher_js_patch = rompatcher_js_create(unpatched, patched, patch_format)
+                self.assertEqual(rompatcher_dx_patch.read_bytes(), rompatcher_js_patch.read_bytes())
 
 
 if __name__ == "__main__":
