@@ -2,6 +2,7 @@
   description = "A ROM patching library and CLI";
 
   inputs = {
+    aeneas.url = "github:AeneasVerif/aeneas/45061fa1a5b4bad876f17c03d3a5544d818622e6";
     devenv.url = "github:cachix/devenv/main";
     files = {
       flake = false;

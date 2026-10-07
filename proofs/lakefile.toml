@@ -1,0 +1,17 @@
+name = "rompatcher-dx"
+version = "0.1.0"
+defaultTargets = ["RompatcherDX", "Proofs"]
+
+[[require]]
+name = "aeneas"
+git = "https://github.com/AeneasVerif/aeneas"
+rev = "45061fa1a5b4bad876f17c03d3a5544d818622e6"
+subDir = "backends/lean"
+
+[[lean_lib]]
+name = "RompatcherDX"
+srcDir = "generated"
+
+[[lean_lib]]
+name = "Proofs"
+srcDir = "src"

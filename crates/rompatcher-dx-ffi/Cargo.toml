@@ -1,0 +1,22 @@
+[package]
+name = "rompatcher-dx-ffi"
+description = "Foreign-language bindings to the rompatcher-dx ROM patching library"
+categories = ["encoding", "external-ffi-bindings", "wasm"]
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+readme.workspace = true
+keywords.workspace = true
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+diplomat.workspace = true
+diplomat-runtime.workspace = true
+rompatcher-dx.workspace = true
+
+[lints]
+workspace = true

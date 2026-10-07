@@ -1,0 +1,22 @@
+[package]
+name = "rompatcher-dx-cli"
+description = "A ROM patching CLI"
+categories = ["command-line-utilities", "encoding"]
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+readme.workspace = true
+keywords.workspace = true
+
+[[bin]]
+name = "rompatcher-dx"
+path = "src/main.rs"
+
+[dependencies]
+clap.workspace = true
+rompatcher-dx.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,13 @@
+{
+  "name": "rompatcher-dx",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "AGPL-3.0-only",
+  "exports": {
+    ".": {
+      "types": "./api/index.d.ts",
+      "default": "./api/index.mjs"
+    }
+  },
+  "files": ["api", "diplomat.config.mjs"]
+}

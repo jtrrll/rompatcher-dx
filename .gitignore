@@ -9,6 +9,10 @@ result-*
 
 # Lean builds
 .lake/
+/proofs/generated/
+
+# Rust builds
+target/
 
 # Terraform state
 .terraform/
